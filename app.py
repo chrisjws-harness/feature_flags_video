@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 weather_cache = {}
 
-def get_weather(city):
+def get_weather(city, **kwargs):
     api_key = os.environ.get('OPENWEATHERMAP_API_KEY')
     if not api_key:
         return None, "OpenWeatherMap API key is missing."
@@ -15,7 +15,7 @@ def get_weather(city):
     if city in weather_cache:
         return weather_cache[city], None
 
-    url = f'http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=imperial'
+    url = f'http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units={kwargs["units"]}'
     response = requests.get(url)
 
     if response.status_code == 200:
@@ -30,10 +30,12 @@ def get_weather(city):
 @app.route('/v1/temperature')
 def get_temperature():
     city = request.args.get('city')
+    units = request.args.get('units', default="imperial")
+
     if not city:
         return jsonify({"error": "City parameter is missing."}), 400
 
-    temperature, error = get_weather(city)
+    temperature, error = get_weather(city, units=units)
     if error:
         return jsonify({"error": error}), 404 if error == "City not found." else 500
 
