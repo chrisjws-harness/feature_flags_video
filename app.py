@@ -4,16 +4,25 @@ import os
 
 app = Flask(__name__)
 
+weather_cache = {}
+
 def get_weather(city):
     api_key = os.environ.get('OPENWEATHERMAP_API_KEY')
     if not api_key:
         return None, "OpenWeatherMap API key is missing."
 
-    url = f'http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=imperial'
+    # Check if the data is already in the cache
+    if city in weather_cache:
+        return weather_cache[city], None
+
+    url = f'http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric'
     response = requests.get(url)
+
     if response.status_code == 200:
         data = response.json()
         temperature = data['main']['temp']
+        # Cache the data for future use
+        weather_cache[city] = temperature
         return temperature, None
     else:
         return None, "City not found."
