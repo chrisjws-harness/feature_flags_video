@@ -33,6 +33,7 @@ units = ["imperial", "metric"]
 print("")
 
 for city in cities:
+    time.sleep(3)
     for unit in units:
         response = requests.get(f"{url}{city}&units={unit}")
         # response.raise_for_status()
