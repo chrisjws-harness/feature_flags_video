@@ -1,19 +1,28 @@
 from flask import Flask, request, jsonify
 import requests
 import os
+from featureflags.client import CfClient
+from featureflags.evaluations.auth_target import Target
+
+ff_api_key = os.environ.get('FF_KEY')
 
 app = Flask(__name__)
+cf = CfClient(ff_api_key)
 
 weather_cache = {}
 
 def get_weather(city, **kwargs):
     api_key = os.environ.get('OPENWEATHERMAP_API_KEY')
+    
     if not api_key:
         return None, "OpenWeatherMap API key is missing."
 
-    # Check if the data is already in the cache
-    if city in weather_cache:
-        return weather_cache[city], None
+    # Wrapped in feature flag
+    target = Target(identifier="user1", name="user1")
+    if cf.bool_variation("cache_result", target, False):
+        # Check if the data is already in the cache
+        if city in weather_cache:
+            return weather_cache[city], None
 
     url = f'http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units={kwargs["units"]}'
     response = requests.get(url)
@@ -21,8 +30,10 @@ def get_weather(city, **kwargs):
     if response.status_code == 200:
         data = response.json()
         temperature = data['main']['temp']
-        # Cache the data for future use
-        weather_cache[city] = temperature
+        # Wrapped in feature flag
+        if cf.bool_variation("cache_result", target, False):
+            # Cache the data for future use
+            weather_cache[city] = temperature
         return temperature, None
     else:
         return None, "City not found."

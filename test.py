@@ -19,7 +19,7 @@ subprocess.run(docker_build_cmd, check=True)
 print("Running Docker container...")
 subprocess.run(docker_run_cmd, check=True)
 
-time.sleep(5)
+time.sleep(10)
 
 # Send an HTTP request to the container
 url = "http://localhost:5000/v1/temperature?city="  
