@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: weather
-        image: chrisjws/webinar:main 
+        image: {{ .Values.app.image }}:{{ .Values.app.tag }} 
         ports:
         - containerPort: 5000
         env:
