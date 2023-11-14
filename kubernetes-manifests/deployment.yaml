@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: weather
-        image: {{ .Values.app.image }}:{{ .Values.app.tag }} 
+        image: {{ .Values.app.image }}
         ports:
         - containerPort: 5000
         env:

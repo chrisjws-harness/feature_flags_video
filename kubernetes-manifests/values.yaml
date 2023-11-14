@@ -1,3 +1,2 @@
 app:
-  tag: <+artifact.image.tag>
   image: <+artifact.image> 
