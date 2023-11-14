@@ -1,2 +1,3 @@
-app:
-  image: <+artifact.image> 
+image: <+artifact.image>
+ff_key: <+secrets.getValue("ff")>
+openweather_key: <+secrets.getValue("openweather")> 

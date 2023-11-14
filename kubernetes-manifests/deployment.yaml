@@ -15,18 +15,11 @@ spec:
     spec:
       containers:
       - name: weather
-        image: {{ .Values.app.image }}
+        image: {{ .Values.image }}
         ports:
         - containerPort: 5000
         env:
         - name: OPENWEATHERMAP_API_KEY
-          valueFrom:
-            secretKeyRef:
-              name: mysecrets
-              key: OPENWEATHERMAP_API_KEY
+          value: {{ .Values.openweather_key }}
         - name: FF_KEY
-          valueFrom:
-            secretKeyRef:
-              name: mysecrets
-              key: FF_KEY
-
+          value: {{ .Values.ff_key }}
