@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: weather
+  namespace: weather-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: your-app
+  template:
+    metadata:
+      labels:
+        app: your-app
+    spec:
+      containers:
+      - name: weather
+        image: chrisjws/webinar:main 
+        ports:
+        - containerPort: 5000
+        env:
+        - name: OPENWEATHERMAP_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: mysecrets
+              key: OPENWEATHERMAP_API_KEY
+        - name: FF_KEY
+          valueFrom:
+            secretKeyRef:
+              name: mysecrets
+              key: FF_KEY
+
