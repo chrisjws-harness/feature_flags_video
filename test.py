@@ -3,26 +3,30 @@ import requests
 import time
 import os
 
-api_key = os.environ.get('OPENWEATHERMAP_API_KEY')
-ff_api_key = os.environ.get('FF_API_KEY')
+
+if os.environ.get("TEST_URL") is None:
+    api_key = os.environ.get('OPENWEATHERMAP_API_KEY')
+    ff_api_key = os.environ.get('FF_API_KEY')
 
 
-# Define the Docker build and run commands
-docker_build_cmd = ["docker", "build", "-t", "flask-weather-app", "."]
-docker_run_cmd = ["docker", "run", "--rm","-d", "-p", "5000:5000", "-e", "OPENWEATHERMAP_API_KEY=%s" % api_key, "-e", "FF_KEY=%s" % ff_api_key, "--name", "weather-app", "flask-weather-app"]
+    # Define the Docker build and run commands
+    docker_build_cmd = ["docker", "build", "-t", "flask-weather-app", "."]
+    docker_run_cmd = ["docker", "run", "--rm","-d", "-p", "5000:5000", "-e", "OPENWEATHERMAP_API_KEY=%s" % api_key, "-e", "FF_KEY=%s" % ff_api_key, "--name", "weather-app", "flask-weather-app"]
 
-# Execute Docker build
-print("Building Docker image...")
-subprocess.run(docker_build_cmd, check=True)
+    # Execute Docker build
+    print("Building Docker image...")
+    subprocess.run(docker_build_cmd, check=True)
 
-# Execute Docker run
-print("Running Docker container...")
-subprocess.run(docker_run_cmd, check=True)
+    # Execute Docker run
+    print("Running Docker container...")
+    subprocess.run(docker_run_cmd, check=True)
 
-time.sleep(5)
+    time.sleep(5)
 
-# Send an HTTP request to the container
-url = "http://localhost:5000/v1/temperature?city="  
+    # Send an HTTP request to the container
+    url = "http://localhost:5000/v1/temperature?city="  
+else:
+    url = os.environ.get("TEST_URL")
 cities = [
     "San Diego", "San Jose", "New York", "Los Angeles", "Chicago", "Miami",
     "Seattle", "Boston", "Denver", "Austin", "Atlanta", "Portland", "Phoenix",
@@ -44,11 +48,8 @@ for city in cities:
 
 print("")
 
-
-stop_container_cmd = ["docker", "stop", "weather-app"]
-remove_image_cmd = ["docker", "rmi", "flask-weather-app"]
-
-
-
-subprocess.run(stop_container_cmd)
-subprocess.run(remove_image_cmd)
+if os.environ.get("TEST_URL") is None:
+    stop_container_cmd = ["docker", "stop", "weather-app"]
+    remove_image_cmd = ["docker", "rmi", "flask-weather-app"]
+    subprocess.run(stop_container_cmd)
+    subprocess.run(remove_image_cmd)
