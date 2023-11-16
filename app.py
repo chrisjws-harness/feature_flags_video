@@ -21,8 +21,9 @@ def get_weather(city, **kwargs):
     target = Target(identifier="user1", name="user1")
     if cf.bool_variation("cache_result", target, False):
         # Check if the data is already in the cache
-        if city in weather_cache:
-            return weather_cache[city], None
+        if city in weather_cache and kwargs["units"] in weather_cache[city]:
+            print("We are using cached values")
+            return weather_cache[city][kwargs["units"]], None
 
     url = f'http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units={kwargs["units"]}'
     response = requests.get(url)
@@ -33,7 +34,10 @@ def get_weather(city, **kwargs):
         # Wrapped in feature flag
         if cf.bool_variation("cache_result", target, False):
             # Cache the data for future use
-            weather_cache[city] = temperature
+            if city not in weather_cache.keys():
+                weather_cache[city] = {kwargs["units"]: temperature}
+            else:
+                weather_cache[city][kwargs["units"]] = temperature
         return temperature, None
     else:
         return None, "City not found."
